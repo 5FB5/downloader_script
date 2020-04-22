@@ -1,4 +1,4 @@
-# downloader_script
+# pydownloader_script
 Script for downloading pictures using links from .txt file
 
 # what you need
