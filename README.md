@@ -1,2 +1,10 @@
 # downloader_script
-Script for downloading files
+Script for downloading pictures using links from .txt file
+
+# what you need
+* python
+
+# how it works
+* collect links in .txt file
+* start script
+* change script if you need download specific file
