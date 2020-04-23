@@ -2,9 +2,8 @@
 Script for downloading files you needed using links from .txt file
 
 # what you need
-* python
+* Python (My version is 3.8.2)
 
 # how it works
-* collect links in .txt file
-* start script
-* modify script if you need
+* Put your chatlog file (called msg.txt) in directory with script.
+* Run script.
