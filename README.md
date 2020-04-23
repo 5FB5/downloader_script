@@ -7,4 +7,4 @@ Script for downloading pictures using links from .txt file
 # how it works
 * collect links in .txt file
 * start script
-* change script if you need download specific file
+* modify script if you need
