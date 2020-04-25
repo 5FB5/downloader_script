@@ -7,7 +7,6 @@ import re       #lib for working with regularss
 file_name = 'msg.txt' #name of file with links
 
 files_filter_links = []
-files_filtered = []
 
 files_pics = []
 
@@ -22,24 +21,26 @@ with io.open(file_name, encoding='utf-8') as file_src: #transfer messages file t
     array_buf = [row.rstrip() for row in file_src]
 
 #SEARCHING PICTURES
+print('SEARCHING PICTURES:')
 for i in array_buf:
    index_pic_files = re.findall(r'(?i)https://.*\.[j,p][p,n]g', i) #try to find pic's extentions
    if bool(index_pic_files) != False:
        for j in index_pic_files:
            files_filter_links.append(j) #transfer links in filtered array
-
-for i in files_filter_links:
-    print(i)
+           print(j)
 
 #write data in links_filtered.txt
 with io.open('links_filtered.txt', 'w') as file_filtered:
    for i in files_filter_links:
       file_filtered.write(i + '\n')
+
+print('PICTURES LINKS ARE WRITTEN IN LINKS_FILTERED.TXT\n')
 #END OF SEARCHING PICTURES
 
 array_buf = 0
 index_pic_files = []
 
+#DOWNLOADING 
 #open filtered file and write data in temp buff
 with io.open('links_filtered.txt', 'r') as file_filtered:
    array_buf = [row.rstrip() for row in file_filtered]
@@ -48,24 +49,31 @@ for i in array_buf:
    index_pic_files = re.findall(r'(?i)https://.*\.[j,p][p,n]g', i) #try to find pic's extentions
    if bool(index_pic_files) != False:
        for j in index_pic_files:
-           files_pics.append(j) #transfer links in filtered array
+           files_pics.append(j) #transfer links in filtered array. Now we have all pic's links and work only with it
 
-#TODO: find files's extention for current file's name
+#TODO: find file's full name
+downloading_files = []
+downloading_file_name = []
+_file_name = []
 
+for i in files_pics: #move from files_pics -> downloading_files
+    downloading_files.append(i)
 
+#now we must split links to get filename
+for i in downloading_files:
+    index_downloading_file = re.findall(r'(?i)https://.*\.[j,p][p,n]g', i)
+    if bool(index_downloading_file) != False:
+        downloading_file_name.append(i)
 
+for i in downloading_file_name:
+    downloading_file_name = re.split(r'https://.*\/', i) 
+    _file_name.append(downloading_file_name[+1]) #and finally we can get file name
 
 #downloading files
-# for i in files_pics:
-#     net_request = requests.get(i)
-#     with open('downloaded/' + str())
-
-#EXAMPLE OF DOWNLOADING
-# for i in files_jpg: #download files in custom folder
-#    r = requests.get(i)
-#    with open('downloaded/' + str(files_jpg.index(i)) + '.jpg', 'wb') as pic:
-#       print('Downloading ' + i + ' ...\n')
-#       pic.write(r.content)
-#       pic.close()
-
-# print('Files downloaded!')
+# for i in _file_name:
+#     with io.open('downloaded/' + i, 'w') as current_file: #FIXME: It must create new file every time
+#         for j in files_pics:
+#             net_request = requests.get(j)
+#             print('Downloading ', i, '...\n')
+#             current_file.write(net_request.content)
+#             print('File downloaded!')
