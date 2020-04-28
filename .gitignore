@@ -1,3 +1,5 @@
 ## ignore all txt files that user must add
 *.txt
+*.exe
+builds
 downloaded
