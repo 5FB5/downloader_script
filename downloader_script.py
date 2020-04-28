@@ -1,66 +1,87 @@
 import requests #lib for working with network
 import io       #lib for correctly working with files
 import os       #lib for working with os features
+import os.path
+import re       #lib for working with regular expressions
 
-file_name = "msg.txt" #name of file with links
+file_name = 'msg.txt' #name of file with links
 
 files_filter_links = []
-files_filtered = []
 
-files_png = [] #initialize arrays with filtered links
-files_jpg = []
+files_links_pics = []
 
-os.mkdir('downloaded') #create folder with result
+#CREATING FILES
+if not os.path.exists('downloaded'):
+    os.mkdir('downloaded') #create folder if not exists
+
+if not os.path.exists(file_name): #create main msg.txt file if not exists
+    with io.open(file_name, 'w') as _file:
+        _file.write('Put anything to find!')
 
 with io.open(file_name, encoding='utf-8') as file_src: #transfer messages file to file_src list
     array_buf = [row.rstrip() for row in file_src]
 
+#SEARCHING LINKS
+print('FOUND LINKS:') #Find links via template
 for i in array_buf:
-   index_jpg = i.find('.jpg') #try to find interesting extention of file
-   index_png = i.find('.png')
+   index_links =  re.findall(r'(?i)https://.*\/[^а-яё,\s]*', i) #index_pic_files = re.findall(r'(?i)https://.*\.[j,p][p,n]g', i) 
+   if bool(index_links) != False:
+       for j in index_links:
+           files_filter_links.append(j) #transfer links in filtered array
 
-   if index_jpg != -1: #if we found extention
-       files_filter_links.append(i) #transfer this link into independent array
-
-   if index_png != -1:
-       files_filter_links.append(i)
-
-index_jpg = 0 #clear our temp variables
-index_png = 0
-array_buf = 0
+if files_filter_links:
+    for i in files_filter_links:
+        print(str(files_filter_links.index(i)) + '. ' + i)
+else:
+    print('NONE')
 
 #write data in links_filtered.txt
 with io.open('links_filtered.txt', 'w') as file_filtered:
    for i in files_filter_links:
       file_filtered.write(i + '\n')
 
+print('\nFOUND LINKS ARE WRITTEN IN LINKS_FILTERED.TXT! DO NOT DELETE IT!\n')
+#END OF SEARCHING LINKS
+
+array_buf = []
+
 #open filtered file and write data in temp buff
-with io.open('links_filtered.txt', 'r') as file_filtered:
-   array_buf = [row.rstrip() for row in file_filtered]
-   
+with io.open('links_filtered.txt', 'r') as links_filtered:
+   array_buf = [row.rstrip() for row in links_filtered]
 
+#SEARCHING PICTURES   
 for i in array_buf:
-   index_jpg = i.find('.jpg')
-   index_png = i.find('.png')
+   index_pic_files = re.findall(r'(?i)https://.*\.[j,p][p,n]g', i) #try to find pic's extentions (jpg, png)
+   if bool(index_pic_files) != False:
+       for j in index_pic_files:
+           files_links_pics.append(j) #transfer links in filtered array. Now we have all pic's links and work only with it
 
-   if index_jpg != -1: #if we found extention
-       files_jpg.append(i) #transfer this link into independent array
+print('FOUND LINKS TO PICTURES:')
+for i in files_links_pics:
+    print(str(files_links_pics.index(i)) + '. ' + i)
 
-   if index_png != -1:
-       files_png.append(i)
+_file_name = []
 
-for i in files_jpg: #download files in custom folder
-   r = requests.get(i)
-   with open('downloaded/' + str(files_jpg.index(i)) + '.jpg', 'wb') as pic:
-      print('Downloading ' + i + ' ...\n')
-      pic.write(r.content)
-      pic.close()
+#Split links to get file name
+for i in files_links_pics:
+        current_pic_filename = re.split(r'https://.*\/', i)
+        _file_name.append(current_pic_filename[+1])
 
-for i in files_png:
-   r = requests.get(i)
-   with open('downloaded/' + str(files_png.index(i)) + '.png', 'wb') as pic2:
-      print('Downloading ' + i + ' ...\n')
-      pic2.write(r.content)
-      pic2.close()
 
-print('Files downloaded!')
+#DOWNLOADING FILES
+#downloading pictures
+for i in range(len(files_links_pics)):
+    net_request = requests.get(files_links_pics[i])
+    if not os.path.exists('downloaded/' + _file_name[i]):
+        with io.open('downloaded/' + _file_name[i], 'wb') as current_file_download:
+            print('\nDownloading ' + _file_name[i] + '...')
+            current_file_download.write(net_request.content)
+            print('Downloaded and saved!')
+    else:
+        with io.open('downloaded/' + str(i) + _file_name[i], 'wb') as current_file_download:
+            print('\nDownloading ' + _file_name[i] + '...')
+            current_file_download.write(net_request.content)
+            print('Downloaded and saved!')
+
+print('\n')
+print('\nAll files downloaded and saved in "Downloaded" folder!')
