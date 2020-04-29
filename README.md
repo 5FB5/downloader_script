@@ -5,6 +5,7 @@ Script for downloading files you needed links from .txt file
 * Python (My version is 3.8.2)
 
 # how it works
-* Put your chatlog file (called msg.txt, I'll fix this in future update) in directory with script. If file doesn't exists, it will created automatically.
-* Run script.
+* Open your text file using "downloader_script.exe" via drag'n'drop
+* Result will save in "Downloaded" folder in source path of text file you using
 * Modify script if you need to download specific file.
+* If you need to compile, use pyinstaller
