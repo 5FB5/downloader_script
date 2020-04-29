@@ -3,8 +3,9 @@ import io       #lib for correctly working with files
 import os       #lib for working with os features
 import os.path
 import re       #lib for working with regular expressions
+import sys      #lib for working with cmd args
 
-file_name = 'msg.txt' #name of file with links
+file_name = sys.argv[1] #name of file with links
 
 files_filter_links = []
 
@@ -14,17 +15,13 @@ files_links_pics = []
 if not os.path.exists('downloaded'):
     os.mkdir('downloaded') #create folder if not exists
 
-if not os.path.exists(file_name): #create main msg.txt file if not exists
-    with io.open(file_name, 'w') as _file:
-        _file.write('Put anything to find!')
-
 with io.open(file_name, encoding='utf-8') as file_src: #transfer messages file to file_src list
     array_buf = [row.rstrip() for row in file_src]
 
 #SEARCHING LINKS
 print('FOUND LINKS:') #Find links via template
 for i in array_buf:
-   index_links =  re.findall(r'(?i)https://.*\/[^а-яё,\s]*', i) #index_pic_files = re.findall(r'(?i)https://.*\.[j,p][p,n]g', i) 
+   index_links =  re.findall(r'(?i)https://.*\/[^а-яё,\s]*', i)
    if bool(index_links) != False:
        for j in index_links:
            files_filter_links.append(j) #transfer links in filtered array
@@ -64,9 +61,8 @@ _file_name = []
 
 #Split links to get file name
 for i in files_links_pics:
-        current_pic_filename = re.split(r'https://.*\/', i)
+        current_pic_filename = re.split(r'(?i)https://.*\/', i)
         _file_name.append(current_pic_filename[+1])
-
 
 #DOWNLOADING FILES
 #downloading pictures
