@@ -11,10 +11,6 @@ init()
 
 file_name = "links.txt" #name of file with links
 
-files_filter_links = []
-files_links_pics = []
-_file_name = []
-
 VERSION = "1.2.0"
 
 def getMultipleValidLinks(links_array):
@@ -26,6 +22,9 @@ def getMultipleValidLinks(links_array):
         if bool(index_links) != False:
             for j in index_links:
                 files_filter_links.append(j) #transfer links in filtered array
+                # getting filename from current link
+                current_filename = re.split(r'(?i)(?:http|https)://.*\/', j)
+                _file_name.append(current_filename[+1])
 
         if files_filter_links: # links output
             for i in files_filter_links:
@@ -36,36 +35,19 @@ def getMultipleValidLinks(links_array):
 
     pass
 
-def searchPicturesLinks(links_array):
-    #SEARCHING PICTURES   
-    for i in links_array:
-        index_pic_files = re.findall(r'(?i)(?:http|https)://.*\.[j,p][p,n]g*', i) #try to find pic's extentions (jpg, png)
-        
-        if bool(index_pic_files) != False:
-            for j in index_pic_files:
-                files_links_pics.append(j) #transfer links in filtered array. Now we have all pic's links and work only with it
-
-    print('Pictures:')
-    for i in files_links_pics:
-        print(colored('+ ' + i, 'green'))
-
-    #Split links to get file name
-    for i in files_links_pics:
-        current_pic_filename = re.split(r'(?i)(?:http|https)://.*\/', i)
-        _file_name.append(current_pic_filename[+1])
-
 def downloadByLinks(file_name_array, links_array):
-    for i in range(len(files_links_pics)):
-        net_request = requests.get(files_links_pics[i])
-        
-        if not os.path.exists('downloaded/' + file_name_array[i]):
+    i = 0
+    for i in range(len(links_array)):
+        net_request = requests.get(links_array[i])
+
+        if (not os.path.exists('downloaded/'.join(file_name_array[i]))):
             with io.open('downloaded/' + file_name_array[i], 'wb') as current_file_download:
                 print(colored('\nDownloading ' + file_name_array[i] + '...', 'yellow'))
                 current_file_download.write(net_request.content)
                 print('Downloaded and saved!')
         else:
             with io.open('downloaded/' + str(i) + file_name_array[i], 'wb') as current_file_download:
-                print(colored('\nDownloading ' + file_name_array[i] + '...', 'yellow'))
+                print(colored('\nDownloading ' + str(i) + file_name_array[i] + '...', 'yellow'))
                 current_file_download.write(net_request.content)
                 print(colored('Downloaded and saved!', 'green'))
 
@@ -74,9 +56,33 @@ def downloadByLinks(file_name_array, links_array):
     
     pass
 
-def downloadManual(): # TODO: manual downloading
-    print("In progress")
+def downloadByLink(filename, link):
+    i = 0
+    net_request = requests.get(link)
+
+    if (not os.path.exists('downloaded/'.join(filename))):
+        with io.open('downloaded/' + filename, 'wb') as current_file_download:
+            print(colored('\nDownloading ' + filename + '...', 'yellow'))
+            current_file_download.write(net_request.content)
+            print('Downloaded and saved!')
+    else:
+        with io.open('downloaded/'+ str(i).join(filename), 'wb') as current_file_download:
+            print(colored('\nDownloading '.join(str(i)).join(filename) + '...', 'yellow'))
+            current_file_download.write(net_request.content)
+            print(colored('Downloaded and saved!', 'green'))
+
+    print('\n')
+    print(colored('\nAll files saved in "downloaded" folder!', 'green'))
+
+pass
+
+def downloadOnce(_link): # TODO: manual downloading
+
+    fileName = re.split(r'(?i)(?:http|https)://.*\/', _link)
+    downloadByLink(fileName, _link)
+    
     pass
+
 
 def downloadMultipleFiles():
     if (os.path.isfile(file_name)): # if file exists
@@ -95,20 +101,16 @@ def downloadMultipleFiles():
                 file_filtered.write(i + '\n')
         #END OF SEARCHING LINKS
 
-        array_buff = []
-
         #open filtered file and write data in temp buff
         with io.open('links_filtered.txt', 'r') as links_filtered:
             array_buff = [row.rstrip() for row in links_filtered]
         print(colored('\nDo NOT delete links_filtered.txt while downloading!\n', 'yellow'))
 
-        # if we want to download pictures
-        searchPicturesLinks(array_buff)
-        downloadByLinks(_file_name, files_links_pics)
-        
+        downloadByLinks(_file_name, files_filter_links)
+    
     else:
         print(file_name + " doesn't exists!")
-
+    
     pass
 
 print("\nSimple Python File Downloader")
@@ -117,15 +119,20 @@ print("Made by 5FB5")
 print("_______________________________")
 
 while (True):
+    array_buff = []
+    files_filter_links = []
+    files_links_pics = []
+    _file_name = []
+
     mode = input("a - download automatically from " + file_name + " file, m - manual download from link you wrote, q - quit\nCommand: ")
 
     if (mode == "a"):
-        print("\n")
         downloadMultipleFiles()
-    
+
     elif (mode == "m"):
         print("\n")
-        downloadManual()
+        current_link = input("Enter link you need: ")
+        downloadOnce(current_link)
 
     elif (mode == "q"):
         print("Quitting program...")
